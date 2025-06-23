@@ -1,0 +1,105 @@
+_target_: src.model.ModelTrainer.ModelTrainer
+disable_auglag_epoch: 300
+
+model:
+  _target_: src.model.InferModesMulti.InferModes
+
+  lag: ${data.data_config.lag}
+  num_nodes: ${data.data_config.num_nodes}
+  nx: ${data.data_config.nx}
+  ny: ${data.data_config.ny}
+  num_variates: ${data.data_config.num_variates}
+
+  graph_sparsity_factor: 10
+  
+  scm_model:
+    _target_: src.model.modules.scm.Rhino.Rhino
+    decoder:
+      _target_: src.model.modules.scm.RhinoSCM.RhinoSCM
+      lag: ${model.model.lag}
+      num_nodes: ${model.model.num_nodes}
+      embedding_dim: 64
+      skip_connection: False # False
+
+    # likelihood_model:
+    #   _target_: src.model.modules.scm.likelihood.MSELikelihood.MSELikelihood
+ 
+    # likelihood_model:
+    #       _target_: src.model.modules.scm.likelihood.SplineLikelihood.SplineLikelihood
+    #       num_nodes: ${model.model.num_nodes}
+
+    likelihood_model:
+      _target_: src.model.modules.scm.likelihood.TemporalConditionalSplineFlow.TemporalConditionalSplineFlow
+      hypernet:
+        _target_: src.model.modules.scm.likelihood.TemporalHyperNet.TemporalHyperNet
+        order: linear
+        lag: ${model.model.lag}
+        data_dim: 1
+        num_nodes: ${model.model.num_nodes}
+        num_bins: 8
+        skip_connection: False # False
+
+  spatial_factors:
+    _target_: src.model.modules.variational.SpatialFactors.SpatialFactors
+    num_variates: ${model.model.num_variates}
+    num_nodes: ${model.model.num_nodes}
+    nx: ${model.model.nx}
+    ny: ${model.model.ny}
+    spherical: False
+
+  f_tilde:
+    _target_: src.model.modules.variational.F_encoder_dv.F_encoder_dv
+    num_variates: ${model.model.num_variates}
+    num_nodes: ${model.model.num_nodes}
+    lag: ${model.model.lag}
+    nx: ${model.model.nx}
+    ny: ${model.model.ny}
+    temperature: 1
+  
+  alpha:
+    _target_: src.model.modules.variational.Alpha.Alpha
+    num_variates: ${model.model.num_variates}
+    num_nodes: ${model.model.num_nodes}
+    disjoint: True
+  
+  # scm_model:
+  #   _target_: src.model.modules.scm.Rhino.Rhino
+  #   decoder:
+  #     _target_: src.model.modules.scm.LinearDecoder.LinearDecoder
+  #     lag: ${model.model.lag}
+  #     num_nodes: ${model.model.num_nodes}
+
+  #   likelihood_model:
+  #     _target_: src.model.modules.scm.likelihood.MSELikelihood.MSELikelihood
+      
+training_config:
+  _target_: src.auglag.AuglagLRConfig.AuglagLRConfig
+
+  lr_update_lag: 500
+  lr_update_lag_best: 500
+  lr_init_dict:
+    scm: 1e-3
+    graph: 1e-3
+    encoder: 1e-3 # 1e-3
+    spatial_factors: 1e-2
+    alpha: 1e-3
+    spatial_decoder: 1e-3 # 1e-3
+
+  aggregation_period: 20
+  lr_factor: 0.1
+  max_lr_down: 3
+  penalty_progress_rate: 0.65
+  safety_rho: 1e13
+  safety_alpha: 1e13
+  inner_early_stopping_patience: 1500
+  max_outer_steps: 100 # 100
+  patience_penalty_reached: 100
+  patience_max_rho: 3
+  penalty_tolerance: 1e-5
+  max_inner_steps: 6000 # 6000,4000
+  force_not_converged: false
+  init_rho: 1
+  init_alpha: 0
+
+# compile model for faster training with pytorch 2.0
+compile: false

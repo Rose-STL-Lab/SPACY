@@ -1,0 +1,29 @@
+_target_: src.baselines.TPCA_PCMCI.TPCA_PCMCI
+
+model:
+  _target_: src.baselines.LEAP.LEAP
+
+  lag: 2
+  num_nodes: ${data.data_config.num_nodes}
+  nx: ${data.data_config.nx}
+  ny: ${data.data_config.ny}
+  num_variates: ${data.data_config.num_variates}
+  nc: 1
+  length: 2
+  z_dim: ${data.data_config.num_nodes}
+  z_dim_trans: ${data.data_config.num_nodes}
+  hidden_dim: 128
+  trans_prior: 'L'
+  infer_mode: 'R'
+  bound: 5
+  count_bins: 8
+  order: 'linear'
+  lr: 1e-3
+  l1: 1e-3
+  beta: 1e-3
+  gamma: 1e-2
+  sigma: 1e-7
+  bias: False
+ 
+# compile model for faster training with pytorch 2.0
+compile: false

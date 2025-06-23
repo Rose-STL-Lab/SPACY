@@ -1,0 +1,13 @@
+
+defaults:
+  - syn_data_config
+
+data_factory:
+  _target_: src.data_generation.SyntheticDataFactory.SyntheticDataFactory
+
+  save_dir: "data-abla/synthetic"
+  gpu: 2
+  burnin_steps: 100
+  num_samples: 100
+  data_config: ${data_config}
+

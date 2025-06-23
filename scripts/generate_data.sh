@@ -1,0 +1,1 @@
+python -m src.data_generation.generate_data

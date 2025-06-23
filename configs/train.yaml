@@ -1,0 +1,10 @@
+defaults:
+  - _self_
+  - paths: default
+  - data: synthetic
+  - model: infer_modes # options: in config/model
+  - logger: many_loggers # csv, wandb, many_loggers
+  - trainer: default
+  - experiment: null
+
+random_seed: 0
