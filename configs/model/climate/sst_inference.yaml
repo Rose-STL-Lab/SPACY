@@ -2,7 +2,7 @@ _target_: src.model.ModelInference.ModelInference
 disable_auglag_epoch: 100
 
 model:
-  _target_: src.model.InferModesMulti.InferModes
+  _target_: src.model.SPACY_Multi.SPACY_Multi
 
   lag: ${data.data_config.lag}
   num_nodes: ${data.data_config.num_nodes}

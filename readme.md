@@ -72,7 +72,7 @@ and run the following command for training:
 
     python -m src.train \
     data.data_config.model=spacy \
-    model=infer_modes \
+    model=SPACY \
     data=synthetic \
     data.data_config.nx=100 \
     data.data_config.ny=100 \

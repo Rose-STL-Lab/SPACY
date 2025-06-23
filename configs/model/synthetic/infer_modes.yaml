@@ -2,7 +2,7 @@ _target_: src.model.ModelTrainer.ModelTrainer
 disable_auglag_epoch: 200 # 200 or 300
 
 model:
-  _target_: src.model.InferModes.InferModes
+  _target_: src.model.SPACY.SPACY
 
   lag: ${data.data_config.lag}
   num_nodes: ${data.data_config.num_nodes}

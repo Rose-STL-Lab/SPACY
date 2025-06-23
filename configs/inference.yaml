@@ -2,11 +2,11 @@ defaults:
   - _self_
   - paths: default
   - data: sst
-  - model: infer_modes_linear # infer_modes, leap, rhino, varimax, sst_linear
+  - model: SPACY # SPACY, SPACY_Multi
   - logger: many_loggers # csv, wandb, many_loggers
   - trainer: default
   - experiment: null
 
 
-checkpoint_path: /kun-data/spacy-evals/logs-0223-synthetic/spacy_linear_num_nodes_30_size_100_map_mlp_0/model=InferModes_data=spacy_inst_graph_type=ER_lag_graph_type=ER_num_nodes=30_nx=100_ny=100_node_dist=10_num_variates=1_functional_relationships=linear_lag=2_noise_type=gaussian_hist_dep_noise=False_time_length=100_map_type=mlp_seed=0/version_0/checkpoints/epoch=2349-step=188000.ckpt
+checkpoint_path: /your/checkpoint/path
 random_seed: 0
