@@ -1,5 +1,7 @@
-# Discovering Latent Structural Causal Models from Spatio-Temporal Data
-Implementation of the paper "Discovering Latent Structural Causal Models from Spatio-Temporal Data", to appear at ICML 2025, Vancouver.
+# Discovering Latent Causal Graphs from Spatiotemporal Data
+
+Implementation of the paper "Discovering Latent Causal Graphs from Spatiotemporal Data
+", to appear at ICML 2025, Vancouver.
 
 Spatio-Temporal Causal Discovery(SPACY) aims to infer latent causal representation and causal graph that drives the dynamics from spatio-temporal data.
 
