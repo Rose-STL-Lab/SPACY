@@ -19,8 +19,8 @@ Model Overview
 Create a conda environment and install the dependencies:
 
     
-    conda create -n your-env-name python=3.10
-    conda activate your-env-name
+    conda create -n spacy python=3.10
+    conda activate spacy
     pip install -r requirements.txt
     pip install tigramite;
 
