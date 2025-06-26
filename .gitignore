@@ -2,9 +2,11 @@ visualize_evaluate.ipynb
 X_savar.gif
 X_spacy.gif
 logs
-data
+/data
 data-old
 data-abla
 outputs
 results
 wandb
+*.pyc
+__pycache__
