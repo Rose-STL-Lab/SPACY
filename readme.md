@@ -93,3 +93,17 @@ and run the following command for training:
 We implemented some parts of our framework using code from [Project Causica](https://github.com/microsoft/causica). 
 
 The data generation process is partially inspired by [SAVAR](https://github.com/xtibau/savar)
+
+## Citation
+
+If you found this work useful, please consider citing us
+
+```
+@inproceedings{wang2025discovering,
+  author       = {Varambally, Sumanth and Ma, Yi-An and Yu, Rose},
+  title        = {Discovering Latent Causal Graphs from Spatiotemporal Data},
+  booktitle    = {International Conference on Machine Learning, {ICML} 2025},
+  series       = {Proceedings of Machine Learning Research},
+  year         = {2025}
+}
+```
