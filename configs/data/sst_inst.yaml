@@ -1,0 +1,11 @@
+_target_: src.data.SSTDataModule.SSTDataModule
+data_dir: "/{your_path}/SST_data"
+
+defaults:
+  - sst_inst_data_config
+  
+train_ids: [0, 400]
+val_ids: [400, 500] 
+batch_size: 1
+
+num_workers: 5

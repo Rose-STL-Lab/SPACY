@@ -1,0 +1,37 @@
+data_config:
+  _target_: src.data.SSTDataConfig.SSTDataConfig
+
+  # data properties
+  model: sst_inst # sst_rmseason, sst_inst, spacy, savar
+  time_length: 12
+
+  # grid properties
+  nx: 192
+  ny: 145
+  num_variates: 3
+
+  # node_dist: 5
+  # node_extent_high: 5
+  # node_extent_low: 1
+  # random_node: true
+  # disjoint_nodes: True # whether distinct variates have disjoint nodes
+  # grid_noise: gaussian
+  # grid_noise_scale: 1e-2
+  map_type: sst
+
+
+  # graph properties
+  functional_relationships: linear
+  lag: 2 # Estimated
+  num_nodes: 30 # Estimated
+
+  # inst_graph_type: ER
+  # lag_graph_type: ER
+  # base_noise_type: gaussian
+  # hist_dep_noise_type: none
+  # noise_scale: 0.5
+  # hist_dep_noise: false
+  # disable_inst: false
+
+  # optional
+  seed: 0

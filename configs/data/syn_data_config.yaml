@@ -1,0 +1,35 @@
+data_config:
+  _target_: src.data.SyntheticDataConfig.SyntheticDataConfig
+
+  # data properties
+  model: spacy # spacy, savar, sst
+  time_length: 100
+
+  # grid properties
+  nx: 100
+  ny: 100
+  node_dist: 10
+  node_extent_high: 6
+  node_extent_low: 3
+  random_node: true
+  num_variates: 1
+  disjoint_nodes: True # whether distinct variates have disjoint nodes
+  grid_noise: gaussian
+  grid_noise_scale: 1e-2
+  map_type: linear
+
+
+  # graph properties
+  functional_relationships: linear
+  inst_graph_type: ER
+  lag_graph_type: ER
+  lag: 2
+  num_nodes: 10
+  base_noise_type: gaussian
+  hist_dep_noise_type: none
+  noise_scale: 0.5
+  hist_dep_noise: false
+  disable_inst: false
+
+  # optional
+  seed: 0

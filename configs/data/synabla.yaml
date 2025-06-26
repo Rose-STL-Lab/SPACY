@@ -1,0 +1,11 @@
+_target_: src.data.SyntheticDataModule.SyntheticDataModule
+data_dir: "data-abla/synthetic"
+
+defaults:
+  - syn_data_config
+  
+train_ids: [0, 80]
+val_ids: [80, 100] 
+batch_size: 1
+
+num_workers: 5

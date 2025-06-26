@@ -1,0 +1,11 @@
+_target_: src.data.SSTDataModule.SSTDataModule
+data_dir: "/kun-data/SST_data"
+
+defaults:
+  - sst_data_config
+  
+train_ids: [0, 320]
+val_ids: [320, 400] 
+batch_size: 1
+
+num_workers: 5
