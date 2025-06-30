@@ -11,29 +11,13 @@ from torchmetrics import MeanSquaredError
 from src.utils.data_normalization import standardize
 import torch.nn as nn
 from src.utils.evaluation import get_permutation_and_eval_mapping, compute_mcc, match_latent_indices
+from src.utils.visualize import get_savedir, visualize_validation_step, visualize_test_step
 from src.auglag.AuglagLRCallback import AuglagLRCallback
 from src.auglag.AuglagLRConfig import AuglagLRConfig
 from src.auglag.AuglagLossCalculator import AuglagLossCalculator
 from src.auglag.AuglagLR import AuglagLR
 from datetime import datetime
 import os
-
-
-def get_savedir(data_string, seed):
-    """ Generate a directory name for saving logs and results.
-    
-    Args:
-        data_string (str): A string representing the data configuration.
-        seed (int): The random seed used for training.
-    Returns:
-        str: The generated directory name.
-    """
-    # datetime object containing current date and time
-    now = datetime.now()
-    # dd/mm/YY H:M:S
-    dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
-    string = f'seed_{seed}_{dt_string}'
-    return os.path.join('logs', data_string, string)
 
 
 class ModelTrainer(pl.LightningModule):
@@ -88,16 +72,8 @@ class ModelTrainer(pl.LightningModule):
         self.lr_scheduler = AuglagLR(config=self.training_config)
         self.loss_calc = AuglagLossCalculator(init_alpha=self.training_config.init_alpha,
                                               init_rho=self.training_config.init_rho)
-        
-        # generate temporary directory for saving visual results
-        self.data_string = f'numnodes_{self.model.num_nodes}_size_{self.model.nx}_numvariates_{self.model.num_variates}'
-        if self.model.nx == 192 and self.model.ny == 145:
-            self.data_string = f'{self.model.data_model}_{self.data_string}'
-
-        self.seed = torch.get_rng_state()[0].item()
-        self.save_dir = get_savedir(self.data_string, self.seed)
-        os.makedirs(self.save_dir)
         self.disable_auglag_epoch = disable_auglag_epoch
+        self.seed = torch.get_rng_state()[0].item()
 
         ##############################################
         # Visualization Param:
@@ -106,6 +82,13 @@ class ModelTrainer(pl.LightningModule):
         self.idx = 0
         self.F_evolve = []
         self.rho_logvar = []
+        # generate temporary directory for saving visual results
+        self.data_string = f'numnodes_{self.model.num_nodes}_size_{self.model.nx}_numvariates_{self.model.num_variates}'
+        if self.model.nx == 192 and self.model.ny == 145:
+            self.data_string = f'{self.model.data_model}_{self.data_string}'
+
+        self.save_dir = get_savedir(self.data_string, self.seed)
+        os.makedirs(self.save_dir)
         ##############################################
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
@@ -264,26 +247,10 @@ class ModelTrainer(pl.LightningModule):
         
         ####################################################################################
         # TODO: Visualizations
-        # save pictures
         self.validating = True
         import matplotlib.pyplot as plt
         if self.validating and batch_idx%20 == 0:
-            # F_mask = F_pred[:,P,:].reshape(-1, self.model.ny, self.model.nx)
-            
-            for i in range(F_mask.shape[0]):
-                for j in range(F_mask.shape[1]):
-                    plt.imsave(os.path.join(self.save_dir, f'F_pred_{i}_{j}.png'), F_mask[i][j].detach().cpu().numpy())
-            plt.close()
-
-            # F_gt = F.reshape(-1, self.model.ny, self.model.nx)
-            if F != []:
-                for i in range(F_gt.shape[0]):
-                    for j in range(F_gt.shape[1]):
-                        plt.imsave(os.path.join(self.save_dir, f'F_gt_{i}_{j}.png'), F_gt[i][j].detach().cpu().numpy())
-            plt.close()
-            combined_factor = torch.sum(F_mask.detach().cpu(), axis=1).reshape(self.model.num_variates, self.model.ny, self.model.nx)
-            self.F_evolve.append(combined_factor)
-            self.rho_logvar.append(self.model.spatial_factors.rho_logvar.detach().cpu())
+            visualize_validation_step(self.save_dir, F_mask, F_gt, self.F_evolve, self.rho_logvar, self.model)
         ####################################################################################
 
 
@@ -388,24 +355,7 @@ class ModelTrainer(pl.LightningModule):
 
         # Visualizations
         if batch_idx%100 == 0:
-            sp = self.model.spatial_factors
-
-            center, scale = sp.get_centers_and_scale()
-
-            torch.save(center.detach().cpu(), os.path.join(self.save_dir, f'center.pt'))
-            torch.save(scale.detach().cpu(), os.path.join(self.save_dir, f'scale.pt'))
-            F_evolve = torch.stack(self.F_evolve, axis = 0)
-            torch.save(F_evolve.detach().cpu(), os.path.join(self.save_dir, f'F_evolve.pt'))
-            
-            rho_logvar = torch.stack(self.rho_logvar, axis = 0)
-            torch.save(rho_logvar.detach().cpu(), os.path.join(self.save_dir, f'rho_logvar.pt'))
-
-            torch.save(F_mask.detach().cpu(), os.path.join(self.save_dir, f'F_pred.pt'))
-            torch.save(G_recon.detach().cpu(), os.path.join(self.save_dir, f'G_pred.pt'))
-
-            if self.model.num_variates > 1:
-                alpha = self.model.alpha.sample_alpha()
-                torch.save(alpha.detach().cpu(), os.path.join(self.save_dir, f'alpha.pt'))
+            visualize_test_step(self.save_dir, self.model, self.F_evolve, self.rho_logvar, F_mask, G_recon)
 
     def setup(self, stage: str) -> None:
         """Compiles model if needed
