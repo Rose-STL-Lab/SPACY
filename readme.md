@@ -89,6 +89,50 @@ and run the following command for training:
     data.data_config.num_nodes=10 \
     random_seed=0;
 
+### 4. Evaluation and Visualization
+
+For testing the model on the data, a CSV file with quantitative results is also saved in `logs/`. 
+
+In addition, the model checkpoint is also stored in `logs/{long_data_name_and_config}/version_i/checkpoints/`
+
+During test evaluation, the following visualizations and artifacts are saved in the logging directory:
+
+- **`F_pred_{i}_{j}.png` / `F_gt_{i}_{j}.png`**: Predicted and ground truth spatial maps for each latent factor (`i`th variate, `j`th spatial factor).
+- **`center.pt` / `scale.pt`**: Learned centers and scales of the spatial factors.
+- **`F_pred.pt`**: Predicted spatial maps.
+- **`G_pred.pt`**: Reconstructed temporal causal graph.
+
+### 5. Inference
+
+To evaluate the model after training, we would run inference on trained model. The inference script loads saved model checkpoint, runs the test_step evaluation, and saves evaluation metrics and visualizations.
+
+To run inference, use the following command:
+
+    python -m src.inference
+Where configurations in `configs/inference.yaml`. Besure to include `checkpoint_path:` to load saved model checkpoint from training
+
+The inference command can also be customized like the following:
+
+    python -m src.inference \
+    data.data_config.model=spacy \
+    model=SPACY \
+    data=synthetic \
+    data.data_config.nx=100 \
+    data.data_config.ny=100 \
+    data.data_config.node_dist=10 \
+    data.data_config.node_extent_high=6 \
+    data.data_config.node_extent_low=3 \
+    data.data_config.functional_relationships=linear \
+    data.data_config.num_variates=1 \
+    data.data_config.base_noise_type=gaussian \
+    data.data_config.hist_dep_noise_type=none \
+    data.data_config.hist_dep_noise=False \
+    data.data_config.noise_scale=0.5 \
+    data.data_config.map_type=linear \
+    data.data_config.num_nodes=10 \
+    random_seed=0;
+
+
 ## Acknowledgement
 We implemented some parts of our framework using code from [Project Causica](https://github.com/microsoft/causica). 
 
