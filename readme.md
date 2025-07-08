@@ -109,7 +109,7 @@ To evaluate the model after training, we would run inference on trained model. T
 To run inference, use the following command:
 
     python -m src.inference
-Where configurations in `configs/inference.yaml`. Besure to include `checkpoint_path:` to load saved model checkpoint from training
+Where the configurations is in `configs/inference.yaml`. Besure to include `checkpoint_path:` to load saved model checkpoint from training
 
 The inference command can also be customized like the following:
 
