@@ -168,8 +168,6 @@ class ModelTrainer(pl.LightningModule):
             A tensor of losses between model predictions and targets.
         """
 
-        self.validating = False # for debugging/visualization
-
         # model step
         total_loss, loss_terms, G, G_recon, F, F_recon, Z_gt, Z_recon = self.model_step(
             batch)
@@ -244,15 +242,6 @@ class ModelTrainer(pl.LightningModule):
             F_gt = F.reshape(self.model.num_variates, -1, self.model.ny, self.model.nx)
             # if self.model.num_nodes == G.shape[-1]:
             self.val_f_mse(F_mask,F_gt)
-        
-        ####################################################################################
-        # TODO: Visualizations
-        self.validating = True
-        import matplotlib.pyplot as plt
-        if self.validating and batch_idx%20 == 0:
-            visualize_validation_step(self.save_dir, F_mask, F_gt, self.F_evolve, self.rho_logvar, self.model)
-        ####################################################################################
-
 
         # update and log metrics
         self.val_loss(loss)
@@ -355,7 +344,7 @@ class ModelTrainer(pl.LightningModule):
 
         # Visualizations
         if batch_idx%100 == 0:
-            visualize_test_step(self.save_dir, self.model, self.F_evolve, self.rho_logvar, F_mask, G_recon)
+            visualize_test_step(self.save_dir, self.model, F_mask, G_recon)
 
     def setup(self, stage: str) -> None:
         """Compiles model if needed

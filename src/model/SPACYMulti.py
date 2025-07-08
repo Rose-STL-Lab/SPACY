@@ -238,64 +238,8 @@ class SPACY_Multi(pl.LightningModule):
 
 
         X_hat = self.spatial_decoder(Z[:, -1], F)
-        
-        # print("Z", Z[0, -1])
-        # print("F", F)
-        # print("Z_logvar", Z_logvar[0, -1])
 
         return X_lag, X_hat, Z_mean, Z_logvar, Z_hat, Z, G, F
-
-    def inference(self,
-                X: torch.Tensor,
-                spatial_factors: torch.Tensor=None) -> Tuple[torch.Tensor]:
-        """Forward model for Spacy
-
-        Args:
-            X (torch.Tensor): Input tensor of shape [batch_size, num_variates, timesteps, num_grid_points]
-        Returns:
-            X_lag (torch.Tensor): Time lagged tensor of shape [n_fragments, num_variates, lag+1, num_grid_points]
-            Z (torch.Tensor): Inferred latent timeseries of shape [n_fragments, num_nodes]
-            X_hat (torch.Tensor): Reconstructed tensor of shape [n_fragments, num_variates, num_grid_points]
-            G (torch.Tensor): Graph of shape [lag+1, num_nodes, num_nodes]
-        """
-        X_lag = convert_data_to_timelagged(X, self.lag)
-
-        batch, num_variates, timesteps, num_grid_points = X_lag.shape
-
-        Z_mean,Z_logvar = self.f_tilde(X_lag)
-
-        # sample Z
-        Z = self.reparameterize(Z_mean, Z_logvar)
-        
-        # sample a graph
-        G = self.temporal_graph_dist.sample_graph()
-
-        # pass through the SCM
-        Z_hat = self.scm_model(Z, G)
-
-
-        # predicting last timestamp
-        Z_pred = self.scm_model.predict(Z,G)
-
-        # sample spatial factor
-        #########################################
-        if spatial_factors != None:
-            alpha = (spatial_factors.max(dim=-1).values > 1e-5).int().squeeze()
-            F = self.spatial_factors.get_spatial_factors()
-            
-            F = torch.einsum("vd,vdl->vdl", alpha, F)
-        #########################################
-        else:
-            spatial_factor = self.spatial_factors.get_spatial_factors()
-            alpha = self.alpha.sample_alpha()
-            F = torch.einsum("vd,vdl->vdl", alpha, spatial_factor)
-
-        # decode Z
-        X_hat = self.spatial_decoder(Z[:, -1], F)
-        X_pred = self.spatial_decoder(Z[:, -1], F)
-        predictions = {'Z':Z_pred, 'X':X_pred}
-
-        return X_lag, X_hat, Z_mean, Z_logvar, Z_hat, Z, G, F, predictions
 
     def get_module_dict(self):
         return {

@@ -1,7 +1,7 @@
 defaults:
   - _self_
   - paths: default
-  - data: sst
+  - data: synthetic
   - model: SPACY # SPACY, SPACY_Multi
   - logger: many_loggers # csv, wandb, many_loggers
   - trainer: default

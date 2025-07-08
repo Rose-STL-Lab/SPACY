@@ -42,7 +42,7 @@ def visualize_validation_step(save_dir, F_mask, F_gt, F_evolve, rho_logvar, mode
         rho_logvar.append(model.spatial_factors.rho_logvar.detach().cpu())
 
 
-def visualize_test_step(save_dir, model, F_evolve, rho_logvar, F_mask, G_recon):
+def visualize_test_step(save_dir, model , F_mask, G_recon, F_evolve = None, rho_logvar = None):
     """
     Visualizes the output of a test step.
     """

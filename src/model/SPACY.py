@@ -243,74 +243,7 @@ class SPACY(pl.LightningModule):
         # decode Z
         X_hat = self.spatial_decoder(Z[:, -1], F)
 
-        # print("Z", Z[0, -1])
-        # print("F", F)
-        # print("Z_logvar", Z_logvar[0, -1])
-
         return X_lag, X_hat, Z_mean, Z_logvar, Z_hat, Z, G, F
-
-    def inference(self,
-                X: torch.Tensor,
-                spatial_factors: torch.Tensor=None) -> Tuple[torch.Tensor]:
-        """Forward model for Spacy (inference)
-
-        Args:
-            X (torch.Tensor): Input tensor of shape [batch_size, num_variates, timesteps, num_grid_points]
-        Returns:
-            X_lag (torch.Tensor): Time lagged tensor of shape [n_fragments, num_variates, lag+1, num_grid_points]
-            Z (torch.Tensor): Inferred latent timeseries of shape [n_fragments, num_nodes]
-            X_hat (torch.Tensor): Reconstructed tensor of shape [n_fragments, num_variates, num_grid_points]
-            G (torch.Tensor): Graph of shape [lag+1, num_nodes, num_nodes]
-        """
-
-
-        X_lag = convert_data_to_timelagged(X, self.lag)
-
-        batch, num_variates, timesteps, num_grid_points = X_lag.shape
-
-        # get the inferred mean and logvar
-        Z = self.f_tilde(X_lag)
-        # Z.shape: (batch, num_variates, lag+1, 2*num_nodes)
-
-        # TODO: fix
-        assert Z.shape[1] == 1, "Only one variate supported"
-        Z = Z.view(batch, self.lag+1, 2*self.num_nodes)
-        # Z.shape: (batch, lag+1, 2*num_nodes)
-
-        Z_mean = Z[..., :self.num_nodes]
-        Z_logvar = Z[..., self.num_nodes:]
-
-        # sample Z
-        Z = self.reparameterize(Z_mean, Z_logvar)
-        
-        # sample a graph
-        G = self.temporal_graph_dist.sample_graph()
-
-        # pass through the SCM
-        Z_hat = self.scm_model(Z, G)
-
-        # predicting last timestamp
-        Z_pred = self.scm_model.predict(Z,G)
-
-        # sample spatial factor
-        #########################################
-        if spatial_factors != None:
-            F = spatial_factors[0]
-        #########################################
-        else:
-            F = self.spatial_factors.get_spatial_factors()
-
-        # decode Z
-        X_hat = self.spatial_decoder(Z[:, -1], F)
-
-        X_pred = self.spatial_decoder(Z[:, -1], F)
-        predictions = {'Z':Z_pred, 'X':X_pred}
-        # print("Z", Z[0, -1])
-        # print("F", F)
-        # print("Z_logvar", Z_logvar[0, -1])
-
-        return X_lag, X_hat, Z_mean, Z_logvar, Z_hat, Z, G, F, predictions
-
 
     def get_module_dict(self):
         """Get the module dictionary for the model
